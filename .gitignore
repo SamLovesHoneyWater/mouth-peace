@@ -11,6 +11,18 @@
 # Sample data
 data/
 
+# Old code
+legacy/
+
+# Logs
+logs/
+
+# Temporary files
+temp/
+
+# Cache files
+__pycache__/
+
 # Editor directories and files
 .idea/
 .vscode/

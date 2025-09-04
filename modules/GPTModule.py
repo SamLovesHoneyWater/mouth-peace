@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from openai import OpenAI
+from constants.PromptConstants import GPT_PROMPT_PRE, GPT_PROMPT_POST
 
 load_dotenv()
 openai_api_key = os.getenv("OPENAI_API_KEY")
@@ -13,6 +14,10 @@ def get_gpt_response(prompt):
         input=prompt
     )
     return response.output_text
+
+def react_to_transcription(transcription):
+    prompt = f"{GPT_PROMPT_PRE}\n{transcription}\n{GPT_PROMPT_POST}"
+    return get_gpt_response(prompt)
 
 if __name__ == "__main__":
     test_prompt = "Hi."
