@@ -1,12 +1,5 @@
-import os
-from dotenv import load_dotenv
-from openai import OpenAI
 from constants.PromptConstants import GPT_PROMPT_PRE, GPT_PROMPT_POST
-
-load_dotenv()
-openai_api_key = os.getenv("OPENAI_API_KEY")
-
-client = OpenAI(api_key=openai_api_key)
+from modules.OpenAIClientModule import openAIClient as client
 
 def get_gpt_response(prompt):
     response = client.responses.create(

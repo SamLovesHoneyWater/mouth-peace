@@ -7,7 +7,7 @@ import keyboard
 
 from constants.GeneralConstants import BUFFER_SECONDS, HOTKEY, TEMP_AUDIO_DIR, LOG_DIR
 from modules.AudioBufferModule import AudioBuffer
-from modules.SpeechModule import transcribe_audio
+from modules.SpeechModule import get_speech_module, BaseSpeechModule
 from modules.GPTModule import react_to_transcription
 from modules.PlaySoundModule import play_sound
 
@@ -28,7 +28,7 @@ logging.basicConfig(
 # -----------------------------
 # Main functionality
 # -----------------------------
-def on_hotkey_pressed(audio_buffer: AudioBuffer):
+def on_hotkey_pressed(audio_buffer: AudioBuffer, speech_module: BaseSpeechModule):
     try:
         logging.info("Hotkey pressed, capturing audio...")
         # Save snapshot to temp file
@@ -37,7 +37,7 @@ def on_hotkey_pressed(audio_buffer: AudioBuffer):
         logging.info(f"Audio snapshot saved: {temp_file_path}")
 
         # Transcribe
-        transcription, metadata = transcribe_audio(temp_file_path)
+        transcription = speech_module.transcribe_audio(temp_file_path)
         logging.info(f"Transcription: {transcription}")
 
         # Generate GPT response
@@ -60,12 +60,17 @@ def on_hotkey_pressed(audio_buffer: AudioBuffer):
         logging.exception(f"Error in hotkey handler: {e}")
 
 def main():
+    # Initialize speech module
+    speech_module = get_speech_module()
+    logging.info(f"Using speech module: {type(speech_module).__name__}")
+    print(f"Using speech module: {type(speech_module).__name__}")
+    
     # Start audio buffer
     audio_buffer = AudioBuffer(buffer_seconds=BUFFER_SECONDS)
     audio_buffer.start()
 
     # Register global hotkey
-    keyboard.add_hotkey(HOTKEY, lambda: threading.Thread(target=on_hotkey_pressed, args=(audio_buffer,), daemon=True).start())
+    keyboard.add_hotkey(HOTKEY, lambda: threading.Thread(target=on_hotkey_pressed, args=(audio_buffer, speech_module), daemon=True).start())
     logging.info(f"Hotkey registered: {HOTKEY}")
 
     # Play welcome sound
